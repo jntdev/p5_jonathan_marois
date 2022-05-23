@@ -10,7 +10,7 @@ let dataId = params.get('id');
  .then((info) => {
   if (Object.keys(info).length === 0){
     throw "info ne contient pas de données";
- }
+  }
     document.querySelector("title").innerHTML = info.name;
     document.querySelector(".item__img").innerHTML = `<img src='${info.imageUrl}' alt='${info.altTxt}'>`;
     document.querySelector("#title").innerHTML = info.name;
@@ -21,20 +21,27 @@ let dataId = params.get('id');
       let option = document.createElement("option");
       option.setAttribute("value",color);
       option.innerHTML = color;
-      document.querySelector("#colors").append(option);
-  });
+      document.querySelector("#colors").append(option);    
+    });
 }).catch((error) => {
   console.log('Il y a eu un problème avec l\'opération fetch: ' + error);
  });
-
 document.getElementById('addToCart').addEventListener('click', function(){
-   let basket = [];
-   let product = {
+  if(document.getElementById("colors").value != "" && document.getElementById("quantity").value < 101 && document.getElementById("quantity").value > 0){
+    let basket = [];
+    let product = {
      id:dataId,
      color:document.getElementById('colors').value,
-     quantity:parseInt(document.getElementById('quantity').value, 10)};
+     quantity:parseInt(document.getElementById('quantity').value, 10),
+     unitPrice:document.querySelector("#price").textContent
+    };
+     
      basket.push(product);
      addBasket(product);
+  }else{
+    console.error("Vous n'avez pas choisi la couleur, ou la quantitée sélectionnée n'est pas valide");
+  }
+   
 });
 
 

@@ -1,31 +1,28 @@
 //import du module basket.js pour eviter la duplication de code
 import { getBasket, changeQuantity, removeFromBasket } from "./basket.js";
 let basketRows = document.querySelector("#cart__items");
-let totalQuantitySpan = document.querySelector("#totalQuantity");
+let totalQuantitySpan = document.getElementById("totalQuantity");
 let totalPriceSpan =document.querySelector("#totalPrice");
-let totalQuantityProduct = 0;
-let totalbasketPrice = 0;
 
-//later usage function
-function reload(){
-    //refesh document before reloading DOM
-    basketRows.innerHTML="";
-    totalQuantitySpan.innerHTML = "";
-    totalQuantityProduct = 0;
-    totalbasketPrice="";
-    totalPriceSpan.innerHTML="";
-    loadPage();
-}
+function totalBasket(){
+    let basket = getBasket();
+    let grandTotal = 0;
+    let totalQuantity = 0;
+    for(let localKanap of basket){
+        grandTotal += localKanap.quantity * localKanap.unitPrice;
+        totalQuantity += parseInt(localKanap.quantity);
+    };
+    totalPriceSpan.innerHTML = grandTotal;
+    totalQuantitySpan.textContent = totalQuantity;
+};
 
-function loadPage(){    
     //refresh LocalStorage
+    totalBasket();
     let basket= getBasket();
     if(basket.length > 0){
         console.log('loaded not empty');
         //boucle dans le panier pour récuperer tout les elements
         for(let localKanap of basket){
-           totalQuantityProduct += localKanap.quantity;
-           totalQuantitySpan.innerHTML = totalQuantityProduct;
             //recupération des infos de chaque produit grace à l'id présent dans le "basket"
             function displayProducts(){
               fetch("http://localhost:3000/api/products/" + localKanap.id)
@@ -34,9 +31,6 @@ function loadPage(){
                       if (Object.keys(ApiKanap).length === 0){
                           throw "info ne contient pas de données";
                       };
-                    //calcule du prix total du panier
-                      totalbasketPrice += localKanap.quantity * ApiKanap.price;
-                      totalPriceSpan.innerHTML = totalbasketPrice;
                     //ecriture du html
                       basketRows.innerHTML += 
                            `<article class="cart__item" data-id="${localKanap.id}" data-color="${localKanap.color}">
@@ -47,7 +41,7 @@ function loadPage(){
                                     <div class="cart__item__content__description">
                                         <h2>${ApiKanap.name}</h2>
                                         <p>${localKanap.color}</p>
-                                        <p>${ApiKanap.price} €</p>
+                                        <p class="priceSpan" data-price="${localKanap.unitPrice}">${localKanap.unitPrice} €</p>
                                     </div>
                                     <div class="cart__item__content__settings">
                                         <div class="cart__item__content__settings__quantity">
@@ -63,19 +57,28 @@ function loadPage(){
                 ;}).then(()=>{
                   let deleteButtons = document.querySelectorAll('.deleteItem');
                   for(let i = 0; i < deleteButtons.length; i++){
-                    deleteButtons[i].addEventListener("click", function(){
-                      removeFromBasket(localKanap);
-                      reload(); 
+                    deleteButtons[i].addEventListener("click", function(e){
+                   
+                         removeFromBasket(basket[i]);
+                         e.currentTarget.closest("article").remove();
+                         totalBasket();
+                        
                      });
                   };
+                   let elements = document.getElementsByClassName("itemQuantity");
+                   for (let i = 0; i < elements.length; i++) {
+                       elements[i].addEventListener('click', function(e){
+                            let quantity = e.currentTarget.value
+                            changeQuantity(localKanap,quantity);
+                            totalBasket();
+                       });
+                   }
                 }).catch((error) => {
                     console.log('Il y a eu un problème avec l\'opération fetch: ' + error);
-                });
+                });  
             };
             displayProducts();
         };
     };
-};
-loadPage();
 
 
