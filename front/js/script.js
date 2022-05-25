@@ -20,7 +20,7 @@ const show_kanap = ()=> {
      });
    })
    .catch((error) => {
-     console.log('Il y a eu un problème avec l\'opération fetch: ' + error);
+     console.error('Il y a eu un problème avec l\'opération fetch: ' + error);
     });
 }
 show_kanap();

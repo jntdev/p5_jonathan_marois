@@ -115,21 +115,21 @@ addEventListener("submit", function (e) {
 
 function createBodyRequest(prenom, nom, adresse, ville, mail) {
   let Basket = getBasket();
-   let idProducts = [];
-   for (let i = 0; i < Basket.length; i++) {
-     idProducts.push(Basket[i].id);
-   }
-   const bodyContent = {
-     contact: {
-       firstName: prenom,
-       lastName: nom,
-       address: adresse,
-       city: ville,
-       email: mail,
-     },
-     products: idProducts,
-   };
-   return bodyContent;
+  let idProducts = [];
+  for (let i = 0; i < Basket.length; i++) {
+    idProducts.push(Basket[i].id);
+  }
+  const bodyContent = {
+    contact: {
+      firstName: prenom,
+      lastName: nom,
+      address: adresse,
+      city: ville,
+      email: mail,
+    },
+    products: idProducts,
+  };
+  return bodyContent;
 };
 
 function sendRequestToApi(body) {
@@ -154,5 +154,6 @@ function sendRequestToApi(body) {
       }else{
         throw "L'order ID est vide";
       }
-    }).catch((error) => {console.log(error)});
+    }).catch((error) => {console.error(error)
+    });
 };
